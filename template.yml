@@ -1,0 +1,46 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  Docker image scanning automation.
+
+  AWS ECR registry push event based DSSC scan.
+
+  This serverless application integrates with Trend Micro deep security smart check using its APIs and sends image details to initiate security scan that is received from AWS cloud watch events.
+
+# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+Globals:
+  Function:
+    Timeout: 3
+
+Resources: 
+
+  EcrDsscScanEvent:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: s3://dssc-slack-notifier-code/AWS-ECR-DSSC-AUTOMATION-1.0.2.zip
+      Handler: lambda_function.lambda_handler
+      Runtime: python2.7
+      MemorySize: 512
+      Timeout: 900
+      Environment:
+        Variables:
+          AWS_ECR_ACCESS: "<AWS_ACCESS_KEY_FOR_ECR_ACCESS>"
+          AWS_ECR_SECRET: "<AWS_SECRET_KEY_FOR_ECR_ACCESS>"
+          DSSC_URL: "<DSSC_URL>"
+          DSSC_PSW: "<DSSC_USER_PASSWORD>"
+          DSSC_USER: "<DSSC_USER_FOR_ECR_AUTOMATION>"
+      Events:
+        Cloudwatch:
+          Type: CloudWatchEvent # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Properties:
+            Pattern:
+              source:
+                - aws.ecr
+              detail-type:
+                - ECR Image Action
+
+Outputs:
+
+  EcrDsscScanEvent:
+    Description: "Deep Security Lambda Function ARN for AWS ECR scan with DSSC automation function"
+    Value: !GetAtt EcrDsscScanEvent.Arn
