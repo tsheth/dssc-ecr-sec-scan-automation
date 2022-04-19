@@ -24,7 +24,7 @@ We also recommend you to use seprate user in DSSC for this automation. for great
 
 
 
-Made with ❤️ by Tejas sheth at Trend Micro. Available on the AWS Serverless Application Repository
+ Available on the AWS Serverless Application Repository
 
 License
 Apache License 2.0 (undefined)
